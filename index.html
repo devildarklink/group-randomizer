@@ -9,13 +9,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-	    height: 100%;
+	        height: 100%;
             background-image: url('https://wallpaperboat.com/wp-content/uploads/2021/07/12/77815/new-world-27.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: #f5f5f5;
-	    display: flex;
+	        display: flex;
     	    flex-direction: column;
         }
         h1 {
@@ -24,7 +24,7 @@
             color: #FFD700; /* New World gold color */
             margin-top: 20px;
         }
-	h3 {
+	    h3 {
             text-align: center;
             font-size: 1.5em;
             color: #FFD700; /* New World gold color */
@@ -32,7 +32,7 @@
         }
         .container {
             max-width: 700px;
-	    width: 100%;
+	        width: 100%;
             margin: 50px auto;
             background-color: rgba(0, 0, 0, 0.8); /* Dark background with transparency */
             padding: 20px;
@@ -45,7 +45,12 @@
             align-items: center;
             flex-direction: column;
             margin-bottom: 15px;
+        }
+        .from-horizontal {
             width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
         }
         .form-group label {
             display: block;
@@ -90,6 +95,18 @@
         .party strong {
             color: #FFD700;
         }
+        #tanksInput {
+            width: 85%;
+        }
+        #numTanks {
+            width: 5%;
+        }
+        #healersInput {
+            width: 85%;
+        }
+        #numHealers {
+            width: 5%;
+        }
 
     </style>
 </head>
@@ -101,22 +118,38 @@
     <div class="container">
         <div class="form-group">
             <label for="numParties">Grupos #</label>
-            <input type="number" id="numParties" min="1" value="2">
+            <div class="from-horizontal">
+                <input type="number" id="numParties" min="1" value="2">
+            </div>
         </div>
 
         <div class="form-group">
             <label for="players">Players (separados por vírgula)</label>
-            <input type="text" id="players" placeholder="Jogador1, Jogador2, Jogador3, etc.">
+            <div class="from-horizontal">
+                <input type="text" id="players" placeholder="Player1, Player2, Player3, etc.">
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="healers">Healers (separados por vírgula)</label>
-            <input type="text" id="healers" placeholder="Curandeiro1, Curandeiro2, etc.">
+            <div class="from-horizontal">
+                <label for="healersLabel">Healers (separados por vírgula)</label>
+                <label for="healersCountLabel">Qty</label>
+            </div>
+            <div class="from-horizontal">
+                <input type="text" id="healersInput" placeholder="Healer1, Healer2, etc.">
+                <input type="number" id="numHealers" min="1" value="1" placeholder="quantidade de healers por grupo">
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="tanks">Tanks (separados por vírgula)</label>
-            <input type="text" id="tanks" placeholder="Tanque1, Tanque2, etc.">
+            <div class="from-horizontal">
+                <label for="tanksLabel">Tanks (separados por vírgula)</label>
+                <label for="tanksCountLabel">Qty</label>
+            </div>
+            <div class="from-horizontal">
+                <input type="text" id="tanksInput" placeholder="Tank1, Tank2, etc.">
+                <input type="number" id="numTanks" min="1" value="1" placeholder="quantidade de tanks por grupo">
+            </div>
         </div>
 
         <button onclick="randomizeParties()">Gerar</button>
@@ -127,9 +160,11 @@
     <script>
         function randomizeParties() {
             const numParties = parseInt(document.getElementById('numParties').value);
+            const numHealers = parseInt(document.getElementById('numHealers').value);
+            const numTanks = parseInt(document.getElementById('numTanks').value);
             const players = document.getElementById('players').value.split(',').map(p => p.trim());
-            const healers = document.getElementById('healers').value.split(',').map(p => p.trim());
-            const tanks = document.getElementById('tanks').value.split(',').map(p => p.trim());
+            const healers = document.getElementById('healersInput').value.split(',').map(p => p.trim());
+            const tanks = document.getElementById('tanksInput').value.split(',').map(p => p.trim());
 
             // Validate input
             if (healers.length < numParties || tanks.length < numParties) {
@@ -156,7 +191,16 @@
 
             // Assign 1 healer and 1 tank per party
             for (let i = 0; i < numParties; i++) {
-                parties[i].push(healers[i], tanks[i]);
+                for( let j = 0; j < numTanks; j++) {
+                    parties[i].push(tanks[j]);
+                    tanks.splice(j, 1);
+                }
+
+                for( let k = 0; k < numHealers; k++) {
+                    parties[i].push(healers[k]);
+                    healers.splice(k, 1);
+                }
+                
             }
 
             // Distribute remaining players randomly
